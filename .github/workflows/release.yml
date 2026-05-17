@@ -9,6 +9,9 @@ on:
     tags:
       - "v*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,21 +19,22 @@ jobs:
     name: Release
     steps:
       - name: Get latest cloudflared version
-        uses: oprypin/find-latest-tag@v1
-        with:
-          repository: cloudflare/cloudflared
-          releases-only: true
         id: cloudflared-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo cloudflare/cloudflared --json tagName -q .tagName)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - run: echo "cloudflared is at version ${{ steps.cloudflared-version.outputs.tag }}"
 
       - name: Get latest built version
-        uses: oprypin/find-latest-tag@v1
-        continue-on-error: true
-        with:
-          repository: paulgit/syno-cloudflared-builds
-          releases-only: true
         id: syno-cloudflared-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo paulgit/syno-cloudflared-builds --json tagName -q .tagName 2>/dev/null || echo "")
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - run: echo "syno-cloudflared is at version ${{ steps.syno-cloudflared-version.outputs.tag }}"
 
@@ -87,21 +91,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get latest cloudflared version
-        uses: oprypin/find-latest-tag@v1
-        with:
-          repository: cloudflare/cloudflared
-          releases-only: true
         id: cloudflared-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo cloudflare/cloudflared --json tagName -q .tagName)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - run: echo "cloudflared is at version ${{ steps.cloudflared-version.outputs.tag }}"
 
       - name: Get latest built version
-        continue-on-error: true
-        uses: oprypin/find-latest-tag@v1
-        with:
-          repository: paulgit/syno-cloudflared-builds
-          releases-only: true
         id: syno-cloudflared-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo paulgit/syno-cloudflared-builds --json tagName -q .tagName 2>/dev/null || echo "")
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - run: echo "syno-cloudflared is at version ${{ steps.syno-cloudflared-version.outputs.tag }}"
 
