@@ -76,7 +76,7 @@ jobs:
 
       - name: Build all for DSM 7
         if: steps.cloudflared-version.outputs.tag != steps.syno-cloudflared-version.outputs.tag
-        run: cd spksrc/spk/cloudflared && make all-archs-7
+        run: cd spksrc/spk/cloudflared && make all-supported
 
       - name: Upload Artifact
         if: steps.cloudflared-version.outputs.tag != steps.syno-cloudflared-version.outputs.tag
