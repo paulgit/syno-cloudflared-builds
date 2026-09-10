@@ -51,6 +51,12 @@ jobs:
         if: steps.cloudflared-version.outputs.tag != steps.syno-cloudflared-version.outputs.tag
         run: cd spksrc/ && make setup
 
+      - name: Neutralize stale buildvcs patch
+        if: steps.cloudflared-version.outputs.tag != steps.syno-cloudflared-version.outputs.tag
+        run: |
+          rm -f spksrc/cross/cloudflared/patches/001-disable-buildvcs.patch
+          sed -i 's/GOFLAGS=-modcacherw/GOFLAGS=-modcacherw -buildvcs=false/' spksrc/mk/spksrc.cross/env-go.mk
+
       - name: Cache
         if: steps.cloudflared-version.outputs.tag != steps.syno-cloudflared-version.outputs.tag
         uses: actions/cache@v4
@@ -84,6 +90,7 @@ jobs:
         with:
           name: packages
           path: spksrc/packages/*
+          if-no-files-found: error
 
   publish:
     name: Publish release
